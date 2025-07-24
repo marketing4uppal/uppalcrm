@@ -503,9 +503,13 @@
         // Load data from memory and local storage for testing
         function loadData() {
             // For testing purposes, we'll simulate persistence
-            const savedLeads = JSON.parse(localStorage.getItem('crmLeads') || '[]');
-            if (savedLeads.length > 0) {
-                leads = savedLeads;
+            try {
+                const savedLeads = JSON.parse(localStorage.getItem('crmLeads') || '[]');
+                if (savedLeads.length > 0) {
+                    leads = savedLeads;
+                }
+            } catch (e) {
+                console.log('No saved data found');
             }
             updateStats();
             renderLeads();
@@ -513,7 +517,11 @@
 
         // Save data for testing
         function saveData() {
-            localStorage.setItem('crmLeads', JSON.stringify(leads));
+            try {
+                localStorage.setItem('crmLeads', JSON.stringify(leads));
+            } catch (e) {
+                console.log('Could not save data');
+            }
         }
 
         // Update statistics
@@ -549,7 +557,7 @@
                 return;
             }
 
-            tbody.innerHTML = leadsToShow.map((lead, index) => `
+            tbody.innerHTML = leadsToShow.map((lead) => `
                 <tr>
                     <td><strong>${(lead.firstName || '') + ' ' + (lead.lastName || '')}</strong></td>
                     <td>${lead.email || '-'}</td>
@@ -557,7 +565,15 @@
                     <td>${lead.leadSource || '-'}</td>
                     <td><span class="status status-${lead.status}">${lead.status.replace('-', ' ')}</span></td>
                     <td><span class="priority priority-${lead.priority}">${lead.priority}</span></td>
-                    <td>${lead.value ? '
+                    <td>${lead.value ? '$' + Number(lead.value).toLocaleString() : '-'}</td>
+                    <td>${lead.lastContact || 'Never'}</td>
+                    <td>${lead.assigned || 'Unassigned'}</td>
+                    <td class="actions">
+                        <button class="btn btn-primary btn-small" onclick="editLead(${leads.indexOf(lead)})">Edit</button>
+                        <button class="btn btn-secondary btn-small" onclick="deleteLead(${leads.indexOf(lead)})" style="background: #e74c3c;">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         // Open add modal
@@ -592,7 +608,7 @@
         function deleteLead(index) {
             if (confirm('Are you sure you want to delete this lead?')) {
                 leads.splice(index, 1);
-                saveData(); // Save after deletion
+                saveData();
                 updateStats();
                 renderLeads();
             }
@@ -628,7 +644,7 @@
                 leads[editingIndex] = lead;
             }
 
-            saveData(); // Save after changes
+            saveData();
             updateStats();
             renderLeads();
             closeModal();
@@ -698,227 +714,48 @@
         }
 
         // Initialize app
-        loadData();
-
-        // Add some sample data for demonstration
-        setTimeout(() => {
-            leads.push(
-                {
-                    firstName: 'John',
-                    lastName: 'Smith',
-                    email: 'john@techsolutions.com',
-                    phone: '(555) 123-4567',
-                    leadSource: 'Website',
-                    status: 'new',
-                    priority: 'high',
-                    value: '15000',
-                    assigned: 'Sarah Johnson',
-                    notes: 'Interested in our premium package',
-                    lastContact: 'Never',
-                    dateAdded: new Date().toLocaleDateString()
-                },
-                {
-                    firstName: 'Maria',
-                    lastName: 'Garcia',
-                    email: 'maria@creativeagency.com',
-                    phone: '(555) 987-6543',
-                    leadSource: 'Phone',
-                    status: 'qualified',
-                    priority: 'medium',
-                    value: '8500',
-                    assigned: 'Mike Wilson',
-                    notes: 'Ready to move forward with proposal',
-                    lastContact: '2 days ago',
-                    dateAdded: new Date(Date.now() - 86400000).toLocaleDateString()
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // Add some sample data for demonstration after a delay
+            setTimeout(() => {
+                if (leads.length === 0) {
+                    leads.push(
+                        {
+                            firstName: 'John',
+                            lastName: 'Smith',
+                            email: 'john@techsolutions.com',
+                            phone: '(555) 123-4567',
+                            leadSource: 'Website',
+                            status: 'new',
+                            priority: 'high',
+                            value: '15000',
+                            assigned: 'Sarah Johnson',
+                            notes: 'Interested in our premium package',
+                            lastContact: 'Never',
+                            dateAdded: new Date().toLocaleDateString()
+                        },
+                        {
+                            firstName: 'Maria',
+                            lastName: 'Garcia',
+                            email: 'maria@creativeagency.com',
+                            phone: '(555) 987-6543',
+                            leadSource: 'Phone',
+                            status: 'qualified',
+                            priority: 'medium',
+                            value: '8500',
+                            assigned: 'Mike Wilson',
+                            notes: 'Ready to move forward with proposal',
+                            lastContact: '2 days ago',
+                            dateAdded: new Date(Date.now() - 86400000).toLocaleDateString()
+                        }
+                    );
+                    saveData();
+                    updateStats();
+                    renderLeads();
                 }
-            );
-            updateStats();
-            renderLeads();
-        }, 1000);
-    </script>
-</body>
-</html> + Number(lead.value).toLocaleString() : '-'}</td>
-                    <td>${lead.lastContact || 'Never'}</td>
-                    <td>${lead.assigned || 'Unassigned'}</td>
-                    <td class="actions">
-                        <button class="btn btn-primary btn-small" onclick="editLead(${leads.indexOf(lead)})">Edit</button>
-                        <button class="btn btn-secondary btn-small" onclick="deleteLead(${leads.indexOf(lead)})" style="background: #e74c3c;">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Open add modal
-        function openAddModal() {
-            editingIndex = -1;
-            document.getElementById('modalTitle').textContent = 'Add New Lead';
-            document.getElementById('leadForm').reset();
-            document.getElementById('leadModal').style.display = 'block';
-        }
-
-        // Edit lead
-        function editLead(index) {
-            editingIndex = index;
-            const lead = leads[index];
-            
-            document.getElementById('modalTitle').textContent = 'Edit Lead';
-            document.getElementById('leadFirstName').value = lead.firstName || '';
-            document.getElementById('leadLastName').value = lead.lastName;
-            document.getElementById('leadEmail').value = lead.email || '';
-            document.getElementById('leadPhone').value = lead.phone || '';
-            document.getElementById('leadSource').value = lead.leadSource || 'Website';
-            document.getElementById('leadStatus').value = lead.status;
-            document.getElementById('leadPriority').value = lead.priority;
-            document.getElementById('leadValue').value = lead.value || '';
-            document.getElementById('leadAssigned').value = lead.assigned || '';
-            document.getElementById('leadNotes').value = lead.notes || '';
-            
-            document.getElementById('leadModal').style.display = 'block';
-        }
-
-        // Delete lead
-        function deleteLead(index) {
-            if (confirm('Are you sure you want to delete this lead?')) {
-                leads.splice(index, 1);
-                saveData(); // Save after deletion
-                updateStats();
-                renderLeads();
-            }
-        }
-
-        // Close modal
-        function closeModal() {
-            document.getElementById('leadModal').style.display = 'none';
-        }
-
-        // Handle form submission
-        document.getElementById('leadForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const lead = {
-                firstName: document.getElementById('leadFirstName').value,
-                lastName: document.getElementById('leadLastName').value,
-                email: document.getElementById('leadEmail').value,
-                phone: document.getElementById('leadPhone').value,
-                leadSource: document.getElementById('leadSource').value,
-                status: document.getElementById('leadStatus').value,
-                priority: document.getElementById('leadPriority').value,
-                value: document.getElementById('leadValue').value,
-                assigned: document.getElementById('leadAssigned').value,
-                notes: document.getElementById('leadNotes').value,
-                lastContact: editingIndex === -1 ? 'Never' : leads[editingIndex].lastContact,
-                dateAdded: editingIndex === -1 ? new Date().toLocaleDateString() : leads[editingIndex].dateAdded
-            };
-
-            if (editingIndex === -1) {
-                leads.push(lead);
-            } else {
-                leads[editingIndex] = lead;
-            }
-
-            saveData(); // Save after changes
-            updateStats();
-            renderLeads();
-            closeModal();
+            }, 1000);
         });
-
-        // Filter leads
-        function filterLeads() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
-            const priorityFilter = document.getElementById('priorityFilter').value;
-
-            const filteredLeads = leads.filter(lead => {
-                const matchesSearch = !searchTerm || 
-                    lead.name.toLowerCase().includes(searchTerm) ||
-                    (lead.company && lead.company.toLowerCase().includes(searchTerm)) ||
-                    lead.email.toLowerCase().includes(searchTerm);
-                
-                const matchesStatus = !statusFilter || lead.status === statusFilter;
-                const matchesPriority = !priorityFilter || lead.priority === priorityFilter;
-
-                return matchesSearch && matchesStatus && matchesPriority;
-            });
-
-            renderLeads(filteredLeads);
-        }
-
-        // Export data
-        function exportData() {
-            if (leads.length === 0) {
-                alert('No data to export!');
-                return;
-            }
-
-            const csvContent = [
-                ['Name', 'Company', 'Email', 'Phone', 'Status', 'Priority', 'Value', 'Assigned To', 'Notes', 'Date Added'],
-                ...leads.map(lead => [
-                    lead.name,
-                    lead.company || '',
-                    lead.email,
-                    lead.phone || '',
-                    lead.status,
-                    lead.priority,
-                    lead.value || '',
-                    lead.assigned || '',
-                    lead.notes || '',
-                    lead.dateAdded
-                ])
-            ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `leads_export_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('leadModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        // Initialize app
-        loadData();
-
-        // Add some sample data for demonstration
-        setTimeout(() => {
-            leads.push(
-                {
-                    name: 'John Smith',
-                    company: 'Tech Solutions Inc',
-                    email: 'john@techsolutions.com',
-                    phone: '(555) 123-4567',
-                    status: 'new',
-                    priority: 'high',
-                    value: '15000',
-                    assigned: 'Sarah Johnson',
-                    notes: 'Interested in our premium package',
-                    lastContact: 'Never',
-                    dateAdded: new Date().toLocaleDateString()
-                },
-                {
-                    name: 'Maria Garcia',
-                    company: 'Creative Agency',
-                    email: 'maria@creativeagency.com',
-                    phone: '(555) 987-6543',
-                    status: 'qualified',
-                    priority: 'medium',
-                    value: '8500',
-                    assigned: 'Mike Wilson',
-                    notes: 'Ready to move forward with proposal',
-                    lastContact: '2 days ago',
-                    dateAdded: new Date(Date.now() - 86400000).toLocaleDateString()
-                }
-            );
-            updateStats();
-            renderLeads();
-        }, 1000);
     </script>
 </body>
 </html>
