@@ -538,6 +538,28 @@
             padding: 40px;
         }
 
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
         .controls {
             display: flex;
             gap: 20px;
@@ -652,28 +674,6 @@
 
         .tab-content.active {
             display: block;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            transform: translateY(0);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
         }
 
         .form-grid {
@@ -944,3 +944,7 @@
                             </div>
                             <div class="form-group">
                                 <select class="form-control" id="statusFilter" onchange="filterLeads()">
+                                    <option value="">All Status</option>
+                                    <option value="new">New</option>
+                                    <option value="trying-to-contact">Trying to Contact</option>
+                                    <option value="contacted">
