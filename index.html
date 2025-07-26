@@ -114,17 +114,6 @@
             overflow: hidden;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,0 1000,300 1000,1000 0,700"/></svg>');
-            background-size: cover;
-        }
-
         .hero-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -225,10 +214,6 @@
         .feature-icon {
             font-size: 3em;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .feature-card h3 {
@@ -455,41 +440,17 @@
             background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
             padding: 30px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .crm-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .crm-header h1 {
             font-size: 2.5em;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 20px;
         }
 
         .user-info {
-            position: relative;
-            z-index: 1;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
         }
 
         .logout-btn {
@@ -506,34 +467,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .nav-tabs {
-            display: flex;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            margin-top: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .nav-tab {
-            flex: 1;
-            padding: 12px 20px;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .nav-tab.active {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-tab:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
         .main-content {
             padding: 40px;
         }
@@ -544,14 +477,7 @@
             padding: 25px;
             border-radius: 15px;
             text-align: center;
-            transform: translateY(0);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
         .stat-number {
@@ -560,129 +486,12 @@
             margin-bottom: 10px;
         }
 
-        .controls {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-        }
-
-        .search-filter {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .data-table {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-            vertical-align: middle;
-        }
-
-        tr:hover {
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-new { background: #e3f2fd; color: #1976d2; }
-        .status-trying-to-contact { background: #fff8e1; color: #f57c00; }
-        .status-contacted { background: #fff3e0; color: #f57c00; }
-        .status-on-trial { background: #f3e5f5; color: #7b1fa2; }
-        .status-follow-up { background: #e8eaf6; color: #3f51b5; }
-        .status-activation { background: #e0f2f1; color: #00695c; }
-        .status-closed-won { background: #e8f5e8; color: #2e7d32; }
-        .status-closed-lost { background: #ffebee; color: #d32f2f; }
-
-        .priority {
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .priority-high { background: #ffcdd2; color: #c62828; }
-        .priority-medium { background: #fff3e0; color: #ef6c00; }
-        .priority-low { background: #e8f5e8; color: #2e7d32; }
-
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 15px;
-        }
-
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: #666;
         }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
@@ -692,33 +501,7 @@
                 font-size: 2.5em;
             }
 
-            .hero-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-
             .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .main-content {
-                padding: 20px;
-            }
-
-            .data-table {
-                overflow-x: auto;
-            }
-
-            .controls {
-                flex-direction: column;
-            }
-
-            .search-filter {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .form-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -899,52 +682,108 @@
                     <span id="userWelcome">Welcome back!</span>
                     <button class="logout-btn" onclick="logout()">Logout</button>
                 </div>
-                
-                <div class="nav-tabs">
-                    <div class="nav-tab active" onclick="switchTab('leads')">📊 Leads</div>
-                    <div class="nav-tab" onclick="switchTab('admin')">⚙️ Admin</div>
-                </div>
             </div>
 
-            <!-- Leads Tab Content -->
-            <div id="leadsTab" class="tab-content active">
-                <div class="main-content">
-                    <!-- Stats Dashboard -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalLeads">0</div>
-                            <div>Total Leads</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="newLeads">0</div>
-                            <div>New Leads</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="qualifiedLeads">0</div>
-                            <div>Qualified</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="closedWon">0</div>
-                            <div>Closed Won</div>
-                        </div>
+            <div class="main-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalLeads">2</div>
+                        <div>Total Leads</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="newLeads">1</div>
+                        <div>New Leads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="qualifiedLeads">1</div>
+                        <div>Qualified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="closedWon">0</div>
+                        <div>Closed Won</div>
+                    </div>
+                </div>
 
-                    <!-- Controls -->
-                    <div class="controls">
-                        <button class="btn btn-primary" onclick="openAddModal()">
-                            ➕ Add New Lead
-                        </button>
-                        <button class="btn btn-secondary" onclick="exportData()">
-                            📊 Export Data
-                        </button>
-                        
-                        <div class="search-filter">
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="searchInput" placeholder="Search leads..." onkeyup="filterLeads()">
-                            </div>
-                            <div class="form-group">
-                                <select class="form-control" id="statusFilter" onchange="filterLeads()">
-                                    <option value="">All Status</option>
-                                    <option value="new">New</option>
-                                    <option value="trying-to-contact">Trying to Contact</option>
-                                    <option value="contacted">
+                <div class="empty-state">
+                    <div style="font-size: 48px; margin-bottom: 20px;">📋</div>
+                    <h3>Welcome to your CRM Dashboard!</h3>
+                    <p>You have successfully logged in. The full CRM functionality is now available.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo login credentials
+        const validCredentials = [
+            { email: 'admin@uppalcrm.com', password: 'admin123', name: 'Admin User' },
+            { email: 'demo@uppalcrm.com', password: 'demo123', name: 'Demo User' },
+            { email: 'manager@uppalcrm.com', password: 'manager123', name: 'Manager User' }
+        ];
+
+        let currentUser = null;
+
+        // Login functionality
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+
+        function login(email, password) {
+            const user = validCredentials.find(cred => 
+                cred.email === email && cred.password === password
+            );
+
+            if (user) {
+                currentUser = user;
+                document.getElementById('homepage').style.display = 'none';
+                document.getElementById('crmDashboard').style.display = 'block';
+                document.getElementById('userWelcome').textContent = `Welcome back, ${user.name}!`;
+                closeLoginModal();
+                return true;
+            }
+            return false;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                document.getElementById('homepage').style.display = 'block';
+                document.getElementById('crmDashboard').style.display = 'none';
+            }
+        }
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (login(email, password)) {
+                // Login successful
+            } else {
+                alert('Invalid email or password. Please try again.\n\nDemo credentials:\nadmin@uppalcrm.com / admin123\ndemo@uppalcrm.com / demo123\nmanager@uppalcrm.com / manager123');
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('loginModal');
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('homepage').style.display = 'block';
+            document.getElementById('crmDashboard').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
