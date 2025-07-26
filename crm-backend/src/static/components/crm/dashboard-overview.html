@@ -1,0 +1,63 @@
+<div id="dashboard" class="crm-section active">
+    <div class="section-header-crm">
+        <h2>Dashboard Overview</h2>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card" onclick="showCRMSection('leads')">
+            <div class="stat-number">24</div>
+            <div class="stat-label">Total Leads</div>
+        </div>
+        <div class="stat-card" onclick="showCRMSection('users')">
+            <div class="stat-number">8</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">156</div>
+            <div class="stat-label">Total Customers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">$45,230</div>
+            <div class="stat-label">Monthly Revenue</div>
+        </div>
+    </div>
+    
+    <div class="dashboard-content">
+        <div class="dashboard-section">
+            <h3>Recent Activity</h3>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon">👤</div>
+                    <div class="activity-details">
+                        <div class="activity-title">New lead added: John Smith</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">📞</div>
+                    <div class="activity-details">
+                        <div class="activity-title">Call scheduled with Sarah Johnson</div>
+                        <div class="activity-time">4 hours ago</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">✅</div>
+                    <div class="activity-details">
+                        <div class="activity-title">Deal closed: $5,000</div>
+                        <div class="activity-time">1 day ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions">
+                <button class="btn btn-primary" onclick="showCRMSection('leads')">Add New Lead</button>
+                <button class="btn btn-outline" onclick="showCRMSection('reports')">View Reports</button>
+                <button class="btn btn-outline" onclick="showCRMSection('users')">Manage Users</button>
+            </div>
+        </div>
+    </div>
+</div>
+
