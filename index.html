@@ -7,6 +7,155 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    // ...existing code...
+    <!-- Homepage -->
+    <div id="homepage">
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-container">
+                <a href="#" class="logo">Uppal CRM</a>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <button class="btn btn-outline" onclick="openLoginModal()">Login</button>
+                    <button class="btn btn-primary" onclick="openLoginModal()">Start Free Trial</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-container">
+                <h1>Transform Your Business Relationships</h1>
+                <p>Uppal CRM helps small businesses build stronger customer relationships, increase sales, and grow faster with intelligent contact management and automation.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-white btn-hero" onclick="openLoginModal()">Start Free Trial</button>
+                    <a href="#features" class="btn btn-outline btn-hero">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="features-container">
+                <div class="section-header">
+                    <h2>Everything You Need to Grow</h2>
+                    <p>Powerful CRM features designed specifically for small businesses and growing teams</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Smart Lead Management</h3>
+                        <p>Track and nurture leads through your entire sales pipeline with automated workflows and intelligent scoring.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h3>Contact Intelligence</h3>
+                        <p>Get a 360-degree view of your customers with social insights, interaction history, and relationship mapping.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Sales Analytics</h3>
+                        <p>Make data-driven decisions with detailed reports, forecasting, and performance tracking dashboards.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section class="stats">
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3>10,000+</h3>
+                        <p>Happy Customers</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>2.5M+</h3>
+                        <p>Contacts Managed</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>45%</h3>
+                        <p>Average Sales Increase</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>99.9%</h3>
+                        <p>Uptime Guarantee</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta">
+            <div class="cta-container">
+                <h2>Ready to Transform Your Business?</h2>
+                <p>Join thousands of businesses already using Uppal CRM to build better customer relationships and drive growth.</p>
+                <button class="btn btn-white btn-hero" onclick="openLoginModal()">Start Your Free Trial Today</button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3>Uppal CRM</h3>
+                        <p>Transform your business relationships with intelligent CRM solutions designed for growing companies.</p>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Product</h3>
+                        <a href="#">Features</a>
+                        <a href="#">Pricing</a>
+                        <a href="#">Integrations</a>
+                        <a href="#">API</a>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Company</h3>
+                        <a href="#">About Us</a>
+                        <a href="#">Careers</a>
+                        <a href="#">Blog</a>
+                        <a href="#">Press</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2024 Uppal CRM. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            <h2>Welcome Back</h2>
+            
+            <!-- Demo Credentials Box -->
+            <div class="demo-credentials">
+                <strong>Demo Login Credentials:</strong>
+                <div class="credential-item">📧 admin@uppalcrm.com | 🔑 admin123</div>
+                <div class="credential-item">📧 demo@uppalcrm.com | 🔑 demo123</div>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" id="loginEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <div class="login-actions">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+                    <a href="#" class="forgot-password">Forgot your password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
