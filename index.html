@@ -60,6 +60,34 @@
             z-index: 1;
         }
 
+        .nav-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
         .header p {
             opacity: 0.9;
             position: relative;
@@ -140,6 +168,15 @@
             transform: translateY(-2px);
         }
 
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+        }
+
         .search-filter {
             display: flex;
             gap: 15px;
@@ -167,7 +204,7 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .leads-table {
+        .data-table {
             background: white;
             border-radius: 15px;
             overflow: hidden;
@@ -206,9 +243,11 @@
         }
 
         .status-new { background: #e3f2fd; color: #1976d2; }
+        .status-trying-to-contact { background: #fff8e1; color: #f57c00; }
         .status-contacted { background: #fff3e0; color: #f57c00; }
-        .status-qualified { background: #e8f5e8; color: #388e3c; }
-        .status-proposal { background: #f3e5f5; color: #7b1fa2; }
+        .status-on-trial { background: #f3e5f5; color: #7b1fa2; }
+        .status-follow-up { background: #e8eaf6; color: #3f51b5; }
+        .status-activation { background: #e0f2f1; color: #00695c; }
         .status-closed-won { background: #e8f5e8; color: #2e7d32; }
         .status-closed-lost { background: #ffebee; color: #d32f2f; }
 
@@ -310,7 +349,7 @@
                 padding: 20px;
             }
             
-            .leads-table {
+            .data-table {
                 overflow-x: auto;
             }
         }
@@ -326,6 +365,14 @@
             opacity: 0.5;
             margin-bottom: 20px;
         }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -333,94 +380,192 @@
         <div class="header">
             <h1>Small Business CRM</h1>
             <p>Manage your leads and grow your business</p>
+            
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="switchTab('leads')">📊 Leads</div>
+                <div class="nav-tab" onclick="switchTab('admin')">⚙️ Admin</div>
+            </div>
         </div>
 
-        <div class="main-content">
-            <!-- Stats Dashboard -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalLeads">0</div>
-                    <div>Total Leads</div>
+        <!-- Leads Tab Content -->
+        <div id="leadsTab" class="tab-content active">
+            <div class="main-content">
+                <!-- Stats Dashboard -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalLeads">0</div>
+                        <div>Total Leads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="newLeads">0</div>
+                        <div>New Leads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="qualifiedLeads">0</div>
+                        <div>Qualified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="closedWon">0</div>
+                        <div>Closed Won</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="newLeads">0</div>
-                    <div>New Leads</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="qualifiedLeads">0</div>
-                    <div>Qualified</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="closedWon">0</div>
-                    <div>Closed Won</div>
-                </div>
-            </div>
 
-            <!-- Controls -->
-            <div class="controls">
-                <button class="btn btn-primary" onclick="openAddModal()">
-                    ➕ Add New Lead
-                </button>
-                <button class="btn btn-secondary" onclick="exportData()">
-                    📊 Export Data
-                </button>
-                
-                <div class="search-filter">
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search leads..." onkeyup="filterLeads()">
-                    </div>
-                    <div class="form-group">
-                        <select class="form-control" id="statusFilter" onchange="filterLeads()">
-                            <option value="">All Status</option>
-                            <option value="new">New</option>
-                            <option value="contacted">Contacted</option>
-                            <option value="qualified">Qualified</option>
-                            <option value="proposal">Proposal</option>
-                            <option value="closed-won">Closed Won</option>
-                            <option value="closed-lost">Closed Lost</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <select class="form-control" id="priorityFilter" onchange="filterLeads()">
-                            <option value="">All Priority</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
+                <!-- Controls -->
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="openAddModal()">
+                        ➕ Add New Lead
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        📊 Export Data
+                    </button>
+                    
+                    <div class="search-filter">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search leads..." onkeyup="filterLeads()">
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" id="statusFilter" onchange="filterLeads()">
+                                <option value="">All Status</option>
+                                <option value="new">New</option>
+                                <option value="trying-to-contact">Trying to Contact</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="on-trial">On Trial</option>
+                                <option value="follow-up">Follow Up</option>
+                                <option value="activation">Activation</option>
+                                <option value="closed-won">Closed Won</option>
+                                <option value="closed-lost">Closed Lost</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" id="priorityFilter" onchange="filterLeads()">
+                                <option value="">All Priority</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Leads Table -->
-            <div class="leads-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Lead Source</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>Value</th>
-                            <th>Last Contact</th>
-                            <th>Assigned To</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leadsTableBody">
-                        <tr>
-                            <td colspan="10" class="empty-state">
-                                <div>
-                                    <div style="font-size: 48px; margin-bottom: 20px;">📋</div>
-                                    <h3>No leads yet</h3>
-                                    <p>Add your first lead to get started!</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Leads Table -->
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Lead Source</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Value</th>
+                                <th>Last Contact</th>
+                                <th>Lead Owner</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody">
+                            <tr>
+                                <td colspan="10" class="empty-state">
+                                    <div>
+                                        <div style="font-size: 48px; margin-bottom: 20px;">📋</div>
+                                        <h3>No leads yet</h3>
+                                        <p>Add your first lead to get started!</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+
+        <!-- Admin Tab Content -->
+        <div id="adminTab" class="tab-content">
+            <div class="main-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div>Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeUsers">0</div>
+                        <div>Active Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="leadsPerUser">0</div>
+                        <div>Avg Leads/User</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="unassignedLeads">0</div>
+                        <div>Unassigned Leads</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="openAddUserModal()">
+                        👤 Add New User
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportUsers()">
+                        📊 Export Users
+                    </button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Assigned Leads</th>
+                                <th>Closed Won</th>
+                                <th>Date Added</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <div>
+                                        <div style="font-size: 48px; margin-bottom: 20px;">👥</div>
+                                        <h3>No users yet</h3>
+                                        <p>Add your first user to get started!</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeUserModal()">&times;</button>
+            <h2 id="userModalTitle">Add New User</h2>
+            <form id="userForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>First Name *</label>
+                        <input type="text" class="form-control" id="userFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name *</label>
+                        <input type="text" class="form-control" id="userLastName" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Email Address *</label>
+                        <input type="email" class="form-control" id="userEmail" required>
+                    </div>
+                </div>
+                <div style="margin-top: 30px; text-align: right;">
+                    <button type="button" class="btn btn-secondary" onclick="closeUserModal()" style="margin-right: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save User</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -457,12 +602,20 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>Lead Owner</label>
+                        <select class="form-control" id="leadOwner">
+                            <option value="">Unassigned</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Status</label>
                         <select class="form-control" id="leadStatus">
                             <option value="new">New</option>
+                            <option value="trying-to-contact">Trying to Contact</option>
                             <option value="contacted">Contacted</option>
-                            <option value="qualified">Qualified</option>
-                            <option value="proposal">Proposal</option>
+                            <option value="on-trial">On Trial</option>
+                            <option value="follow-up">Follow Up</option>
+                            <option value="activation">Activation</option>
                             <option value="closed-won">Closed Won</option>
                             <option value="closed-lost">Closed Lost</option>
                         </select>
@@ -479,10 +632,6 @@
                         <label>Potential Value ($)</label>
                         <input type="number" class="form-control" id="leadValue" min="0" step="100">
                     </div>
-                    <div class="form-group">
-                        <label>Assigned To</label>
-                        <input type="text" class="form-control" id="leadAssigned" placeholder="Team member name">
-                    </div>
                 </div>
                 <div class="form-group">
                     <label>Notes</label>
@@ -498,43 +647,112 @@
 
     <script>
         let leads = [];
+        let users = [];
         let editingIndex = -1;
+        let editingUserIndex = -1;
 
-        // Load data from memory and local storage for testing
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab appearance
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/hide content
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            if (tabName === 'leads') {
+                document.getElementById('leadsTab').classList.add('active');
+            } else if (tabName === 'admin') {
+                document.getElementById('adminTab').classList.add('active');
+                updateUserStats();
+                renderUsers();
+            }
+        }
+
+        // Load and save data using JavaScript variables (no localStorage as per restrictions)
         function loadData() {
-            // For testing purposes, we'll simulate persistence
-            try {
-                const savedLeads = JSON.parse(localStorage.getItem('crmLeads') || '[]');
-                if (savedLeads.length > 0) {
-                    leads = savedLeads;
-                }
-            } catch (e) {
-                console.log('No saved data found');
+            // Initialize with sample data if empty
+            if (leads.length === 0) {
+                leads = [
+                    {
+                        firstName: 'John',
+                        lastName: 'Smith',
+                        email: 'john@techsolutions.com',
+                        phone: '(555) 123-4567',
+                        leadSource: 'Website',
+                        status: 'new',
+                        priority: 'high',
+                        value: '15000',
+                        leadOwner: '',
+                        notes: 'Interested in our premium package',
+                        lastContact: 'Never',
+                        dateAdded: new Date().toLocaleDateString()
+                    },
+                    {
+                        firstName: 'Maria',
+                        lastName: 'Garcia',
+                        email: 'maria@creativeagency.com',
+                        phone: '(555) 987-6543',
+                        leadSource: 'Phone',
+                        status: 'on-trial',
+                        priority: 'medium',
+                        value: '8500',
+                        leadOwner: '',
+                        notes: 'Ready to move forward with proposal',
+                        lastContact: '2 days ago',
+                        dateAdded: new Date(Date.now() - 86400000).toLocaleDateString()
+                    }
+                ];
             }
             updateStats();
             renderLeads();
-        }
-
-        // Save data for testing
-        function saveData() {
-            try {
-                localStorage.setItem('crmLeads', JSON.stringify(leads));
-            } catch (e) {
-                console.log('Could not save data');
-            }
         }
 
         // Update statistics
         function updateStats() {
             const totalLeads = leads.length;
             const newLeads = leads.filter(lead => lead.status === 'new').length;
-            const qualifiedLeads = leads.filter(lead => lead.status === 'qualified').length;
+            const qualifiedLeads = leads.filter(lead => lead.status === 'on-trial' || lead.status === 'activation').length;
             const closedWon = leads.filter(lead => lead.status === 'closed-won').length;
 
             document.getElementById('totalLeads').textContent = totalLeads;
             document.getElementById('newLeads').textContent = newLeads;
             document.getElementById('qualifiedLeads').textContent = qualifiedLeads;
             document.getElementById('closedWon').textContent = closedWon;
+        }
+
+        // Update user statistics
+        function updateUserStats() {
+            const totalUsers = users.length;
+            const activeUsers = users.length;
+            const leadsPerUser = users.length > 0 ? Math.round(leads.length / users.length) : 0;
+            const unassignedLeads = leads.filter(lead => !lead.leadOwner).length;
+
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('activeUsers').textContent = activeUsers;
+            document.getElementById('leadsPerUser').textContent = leadsPerUser;
+            document.getElementById('unassignedLeads').textContent = unassignedLeads;
+        }
+
+        // Get user name by ID
+        function getUserName(userId) {
+            const user = users.find(u => u.id === userId);
+            return user ? `${user.firstName} ${user.lastName}` : null;
+        }
+
+        // Update lead owner dropdown options
+        function updateLeadOwnerOptions() {
+            const leadOwnerSelect = document.getElementById('leadOwner');
+            leadOwnerSelect.innerHTML = '<option value="">Unassigned</option>';
+            
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.firstName} ${user.lastName}`;
+                leadOwnerSelect.appendChild(option);
+            });
         }
 
         // Render leads table
@@ -563,17 +781,57 @@
                     <td>${lead.email || '-'}</td>
                     <td>${lead.phone || '-'}</td>
                     <td>${lead.leadSource || '-'}</td>
-                    <td><span class="status status-${lead.status}">${lead.status.replace('-', ' ')}</span></td>
+                    <td><span class="status status-${lead.status}">${lead.status.replace(/-/g, ' ')}</span></td>
                     <td><span class="priority priority-${lead.priority}">${lead.priority}</span></td>
                     <td>${lead.value ? '$' + Number(lead.value).toLocaleString() : '-'}</td>
                     <td>${lead.lastContact || 'Never'}</td>
-                    <td>${lead.assigned || 'Unassigned'}</td>
+                    <td>${getUserName(lead.leadOwner) || 'Unassigned'}</td>
                     <td class="actions">
                         <button class="btn btn-primary btn-small" onclick="editLead(${leads.indexOf(lead)})">Edit</button>
-                        <button class="btn btn-secondary btn-small" onclick="deleteLead(${leads.indexOf(lead)})" style="background: #e74c3c;">Delete</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteLead(${leads.indexOf(lead)})">Delete</button>
                     </td>
                 </tr>
             `).join('');
+        }
+
+        // Render users table
+        function renderUsers(filteredUsers = null) {
+            const usersToShow = filteredUsers || users;
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (usersToShow.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div>
+                                <div style="font-size: 48px; margin-bottom: 20px;">👥</div>
+                                <h3>${filteredUsers ? 'No users match your filters' : 'No users yet'}</h3>
+                                <p>${filteredUsers ? 'Try adjusting your search criteria' : 'Add your first user to get started!'}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = usersToShow.map((user) => {
+                const assignedLeads = leads.filter(lead => lead.leadOwner === user.id).length;
+                const closedWon = leads.filter(lead => lead.leadOwner === user.id && lead.status === 'closed-won').length;
+                
+                return `
+                    <tr>
+                        <td><strong>${user.firstName} ${user.lastName}</strong></td>
+                        <td>${user.email}</td>
+                        <td>${assignedLeads}</td>
+                        <td>${closedWon}</td>
+                        <td>${user.dateAdded}</td>
+                        <td class="actions">
+                            <button class="btn btn-primary btn-small" onclick="editUser(${users.indexOf(user)})">Edit</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteUser(${users.indexOf(user)})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // Open add modal
@@ -581,7 +839,16 @@
             editingIndex = -1;
             document.getElementById('modalTitle').textContent = 'Add New Lead';
             document.getElementById('leadForm').reset();
+            updateLeadOwnerOptions();
             document.getElementById('leadModal').style.display = 'block';
+        }
+
+        // Open add user modal
+        function openAddUserModal() {
+            editingUserIndex = -1;
+            document.getElementById('userModalTitle').textContent = 'Add New User';
+            document.getElementById('userForm').reset();
+            document.getElementById('userModal').style.display = 'block';
         }
 
         // Edit lead
@@ -598,28 +865,72 @@
             document.getElementById('leadStatus').value = lead.status;
             document.getElementById('leadPriority').value = lead.priority;
             document.getElementById('leadValue').value = lead.value || '';
-            document.getElementById('leadAssigned').value = lead.assigned || '';
             document.getElementById('leadNotes').value = lead.notes || '';
             
+            updateLeadOwnerOptions();
+            document.getElementById('leadOwner').value = lead.leadOwner || '';
+            
             document.getElementById('leadModal').style.display = 'block';
+        }
+
+        // Edit user
+        function editUser(index) {
+            editingUserIndex = index;
+            const user = users[index];
+            
+            document.getElementById('userModalTitle').textContent = 'Edit User';
+            document.getElementById('userFirstName').value = user.firstName;
+            document.getElementById('userLastName').value = user.lastName;
+            document.getElementById('userEmail').value = user.email;
+            
+            document.getElementById('userModal').style.display = 'block';
+        }
+
+        // Delete user
+        function deleteUser(index) {
+            const user = users[index];
+            const assignedLeads = leads.filter(lead => lead.leadOwner === user.id).length;
+            
+            if (assignedLeads > 0) {
+                if (!confirm(`This user has ${assignedLeads} assigned leads. Deleting will unassign these leads. Continue?`)) {
+                    return;
+                }
+                // Unassign leads from this user
+                leads.forEach(lead => {
+                    if (lead.leadOwner === user.id) {
+                        lead.leadOwner = '';
+                    }
+                });
+            }
+            
+            if (confirm('Are you sure you want to delete this user?')) {
+                users.splice(index, 1);
+                updateUserStats();
+                renderUsers();
+                updateLeadOwnerOptions();
+                renderLeads(); // Refresh leads to show unassigned
+            }
         }
 
         // Delete lead
         function deleteLead(index) {
             if (confirm('Are you sure you want to delete this lead?')) {
                 leads.splice(index, 1);
-                saveData();
                 updateStats();
                 renderLeads();
             }
         }
 
-        // Close modal
+        // Close modals
         function closeModal() {
             document.getElementById('leadModal').style.display = 'none';
         }
 
-        // Handle form submission
+        function closeUserModal() {
+            document.getElementById('userModal').style.display = 'none';
+        }
+
+        // Handle lead form submission
         document.getElementById('leadForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -632,7 +943,7 @@
                 status: document.getElementById('leadStatus').value,
                 priority: document.getElementById('leadPriority').value,
                 value: document.getElementById('leadValue').value,
-                assigned: document.getElementById('leadAssigned').value,
+                leadOwner: document.getElementById('leadOwner').value,
                 notes: document.getElementById('leadNotes').value,
                 lastContact: editingIndex === -1 ? 'Never' : leads[editingIndex].lastContact,
                 dateAdded: editingIndex === -1 ? new Date().toLocaleDateString() : leads[editingIndex].dateAdded
@@ -644,10 +955,33 @@
                 leads[editingIndex] = lead;
             }
 
-            saveData();
             updateStats();
             renderLeads();
             closeModal();
+        });
+
+        // Handle user form submission
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const user = {
+                id: editingUserIndex === -1 ? Date.now().toString() : users[editingUserIndex].id,
+                firstName: document.getElementById('userFirstName').value,
+                lastName: document.getElementById('userLastName').value,
+                email: document.getElementById('userEmail').value,
+                dateAdded: editingUserIndex === -1 ? new Date().toLocaleDateString() : users[editingUserIndex].dateAdded
+            };
+
+            if (editingUserIndex === -1) {
+                users.push(user);
+            } else {
+                users[editingUserIndex] = user;
+            }
+
+            updateUserStats();
+            renderUsers();
+            updateLeadOwnerOptions();
+            closeUserModal();
         });
 
         // Filter leads
@@ -672,6 +1006,38 @@
             renderLeads(filteredLeads);
         }
 
+        // Export users
+        function exportUsers() {
+            if (users.length === 0) {
+                alert('No users to export!');
+                return;
+            }
+
+            const csvContent = [
+                ['First Name', 'Last Name', 'Email', 'Assigned Leads', 'Closed Won', 'Date Added'],
+                ...users.map(user => {
+                    const assignedLeads = leads.filter(lead => lead.leadOwner === user.id).length;
+                    const closedWon = leads.filter(lead => lead.leadOwner === user.id && lead.status === 'closed-won').length;
+                    return [
+                        user.firstName,
+                        user.lastName,
+                        user.email,
+                        assignedLeads,
+                        closedWon,
+                        user.dateAdded
+                    ];
+                })
+            ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
         // Export data
         function exportData() {
             if (leads.length === 0) {
@@ -680,7 +1046,7 @@
             }
 
             const csvContent = [
-                ['First Name', 'Last Name', 'Email', 'Phone', 'Lead Source', 'Status', 'Priority', 'Value', 'Assigned To', 'Notes', 'Date Added'],
+                ['First Name', 'Last Name', 'Email', 'Phone', 'Lead Source', 'Status', 'Priority', 'Value', 'Lead Owner', 'Notes', 'Date Added'],
                 ...leads.map(lead => [
                     lead.firstName || '',
                     lead.lastName || '',
@@ -690,7 +1056,7 @@
                     lead.status,
                     lead.priority,
                     lead.value || '',
-                    lead.assigned || '',
+                    getUserName(lead.leadOwner) || 'Unassigned',
                     lead.notes || '',
                     lead.dateAdded
                 ])
@@ -707,54 +1073,19 @@
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('leadModal');
-            if (event.target === modal) {
+            const leadModal = document.getElementById('leadModal');
+            const userModal = document.getElementById('userModal');
+            if (event.target === leadModal) {
                 closeModal();
+            }
+            if (event.target === userModal) {
+                closeUserModal();
             }
         }
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
-            
-            // Add some sample data for demonstration after a delay
-            setTimeout(() => {
-                if (leads.length === 0) {
-                    leads.push(
-                        {
-                            firstName: 'John',
-                            lastName: 'Smith',
-                            email: 'john@techsolutions.com',
-                            phone: '(555) 123-4567',
-                            leadSource: 'Website',
-                            status: 'new',
-                            priority: 'high',
-                            value: '15000',
-                            assigned: 'Sarah Johnson',
-                            notes: 'Interested in our premium package',
-                            lastContact: 'Never',
-                            dateAdded: new Date().toLocaleDateString()
-                        },
-                        {
-                            firstName: 'Maria',
-                            lastName: 'Garcia',
-                            email: 'maria@creativeagency.com',
-                            phone: '(555) 987-6543',
-                            leadSource: 'Phone',
-                            status: 'qualified',
-                            priority: 'medium',
-                            value: '8500',
-                            assigned: 'Mike Wilson',
-                            notes: 'Ready to move forward with proposal',
-                            lastContact: '2 days ago',
-                            dateAdded: new Date(Date.now() - 86400000).toLocaleDateString()
-                        }
-                    );
-                    saveData();
-                    updateStats();
-                    renderLeads();
-                }
-            }, 1000);
         });
     </script>
 </body>
