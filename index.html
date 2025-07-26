@@ -1,468 +1,4 @@
-let currentUser = null;
-        let editingLeadId = null;
-        let editingContactId = null;
-        let editingUserId = null;
-
-        // Sample data
-        let leads = [
-            {
-                id: 1,
-                firstName: 'John',
-                lastName: 'Smith',
-                email: 'john.smith@example.com',
-                phone: '+1-555-0123',
-                company: 'Tech Solutions Inc.',
-                status: 'new',
-                value: 5000,
-                notes: 'Interested in our premium package'
-            },
-            {
-                id: 2,
-                firstName: 'Sarah',
-                lastName: 'Johnson',
-                email: 'sarah.j@businesscorp.com',
-                phone: '+1-555-0456',
-                company: 'Business Corp',
-                status: 'qualified',
-                value: 12000,
-                notes: 'Decision maker, ready to proceed'
-            }
-        ];
-
-        let contacts = [
-            {
-                id: 1,
-                firstName: 'Mike',
-                lastName: 'Davis',
-                email: 'mike.davis@partner.com',
-                phone: '+1-555-0789',
-                company: 'Partner Solutions',
-                type: 'partner',
-                jobTitle: 'Sales Director'
-            },
-            {
-                id: 2,
-                firstName: 'Lisa',
-                lastName: 'Wong',
-                email: 'lisa.wong@customer.com',
-                phone: '+1-555-0321',
-                company: 'Customer Inc.',
-                type: 'customer',
-                jobTitle: 'IT Manager'
-            }
-        ];
-
-        let users = [
-            {
-                id: 1,
-                firstName: 'Admin',
-                lastName: 'User',
-                email: 'admin@uppalcrm.com',
-                role: 'admin',
-                status: 'active',
-                lastLogin: '2024-07-26'
-            },
-            {
-                id: 2,
-                firstName: 'Demo',
-                lastName: 'User',
-                email: 'demo@uppalcrm.com',
-                role: 'user',
-                status: 'active',
-                lastLogin: '2024-07-25'
-            }
-        ];
-
-        // Navigation functions
-        function switchSection(section) {
-            // Hide all sections
-            document.querySelectorAll('.crm-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.crm-nav-item').forEach(n => n.classList.remove('active'));
-            
-            // Show selected section
-            const sectionElement = document.getElementById(section + '-section');
-            if (sectionElement) {
-                sectionElement.classList.add('active');
-            }
-            
-            // Highlight active nav item
-            const navItems = document.querySelectorAll('.crm-nav-item');
-            navItems.forEach(item => {
-                if (item.textContent.toLowerCase() === section) {
-                    item.classList.add('active');
-                }
-            });
-            
-            // Refresh data
-            if (section === 'leads') renderLeads();
-            if (section === 'contacts') renderContacts();
-            if (section === 'users') renderUsers();
-            if (section === 'dashboard') updateDashboardStats();
-        }
-
-        // Dashboard stats
-        function updateDashboardStats() {
-            const totalLeads = leads.length;
-            const newLeads = leads.filter(l => l.status === 'new').length;
-            const qualifiedLeads = leads.filter(l => l.status === 'qualified').length;
-            const closedWon = leads.filter(l => l.status === 'closed').length;
-            
-            document.getElementById('totalLeads').textContent = totalLeads;
-            document.getElementById('newLeads').textContent = newLeads;
-            document.getElementById('qualifiedLeads').textContent = qualifiedLeads;
-            document.getElementById('closedWon').textContent = closedWon;
-        }
-
-        // Lead management
-        function renderLeads() {
-            const tbody = document.getElementById('leads-table-body');
-            tbody.innerHTML = '';
-            
-            if (leads.length === 0) {
-                tbody.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">👥</div>
-                        <h3>No leads yet</h3>
-                        <p>Click "Add New Lead" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            leads.forEach(lead => {
-                const row = document.createElement('div');
-                row.className = 'table-row';
-                row.innerHTML = `
-                    <div>
-                        <strong>${lead.firstName} ${lead.lastName}</strong><br>
-                        <small style="color: #666;">${lead.email}</small>
-                    </div>
-                    <div>${lead.company || '-'}</div>
-                    <div><span class="status-badge status-${lead.status}">${lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}</span></div>
-                    <div>${lead.value ? lead.value.toLocaleString() : '0'}</div>
-                    <div class="action-buttons">
-                        <button class="action-btn edit-btn" onclick="editLead(${lead.id})">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteLead(${lead.id})">Delete</button>
-                    </div>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function openLeadForm(leadId = null) {
-            editingLeadId = leadId;
-            const modal = document.getElementById('leadModal');
-            const title = document.getElementById('leadModalTitle');
-            const form = document.getElementById('leadForm');
-            
-            if (leadId) {
-                const lead = leads.find(l => l.id === leadId);
-                title.textContent = 'Edit Lead';
-                document.getElementById('leadFirstName').value = lead.firstName;
-                document.getElementById('leadLastName').value = lead.lastName;
-                document.getElementById('leadEmail').value = lead.email;
-                document.getElementById('leadPhone').value = lead.phone || '';
-                document.getElementById('leadCompany').value = lead.company || '';
-                document.getElementById('leadStatus').value = lead.status;
-                document.getElementById('leadValue').value = lead.value || '';
-                document.getElementById('leadNotes').value = lead.notes || '';
-            } else {
-                title.textContent = 'Add New Lead';
-                form.reset();
-            }
-            
-            modal.style.display = 'block';
-        }
-
-        function closeLeadForm() {
-            document.getElementById('leadModal').style.display = 'none';
-            document.getElementById('leadForm').reset();
-            editingLeadId = null;
-        }
-
-        function editLead(id) {
-            openLeadForm(id);
-        }
-
-        function deleteLead(id) {
-            if (confirm('Are you sure you want to delete this lead?')) {
-                leads = leads.filter(l => l.id !== id);
-                renderLeads();
-                updateDashboardStats();
-            }
-        }
-
-        // Contact management
-        function renderContacts() {
-            const tbody = document.getElementById('contacts-table-body');
-            tbody.innerHTML = '';
-            
-            if (contacts.length === 0) {
-                tbody.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">📇</div>
-                        <h3>No contacts yet</h3>
-                        <p>Click "Add New Contact" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            contacts.forEach(contact => {
-                const row = document.createElement('div');
-                row.className = 'table-row';
-                row.innerHTML = `
-                    <div>
-                        <strong>${contact.firstName} ${contact.lastName}</strong><br>
-                        <small style="color: #666;">${contact.email}</small>
-                    </div>
-                    <div>${contact.phone || '-'}</div>
-                    <div>${contact.company || '-'}</div>
-                    <div><span class="status-badge status-${contact.type}">${contact.type.charAt(0).toUpperCase() + contact.type.slice(1)}</span></div>
-                    <div class="action-buttons">
-                        <button class="action-btn edit-btn" onclick="editContact(${contact.id})">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteContact(${contact.id})">Delete</button>
-                    </div>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function openContactForm(contactId = null) {
-            editingContactId = contactId;
-            const modal = document.getElementById('contactModal');
-            const title = document.getElementById('contactModalTitle');
-            const form = document.getElementById('contactForm');
-            
-            if (contactId) {
-                const contact = contacts.find(c => c.id === contactId);
-                title.textContent = 'Edit Contact';
-                document.getElementById('contactFirstName').value = contact.firstName;
-                document.getElementById('contactLastName').value = contact.lastName;
-                document.getElementById('contactEmail').value = contact.email;
-                document.getElementById('contactPhone').value = contact.phone || '';
-                document.getElementById('contactCompany').value = contact.company || '';
-                document.getElementById('contactType').value = contact.type;
-                document.getElementById('contactJobTitle').value = contact.jobTitle || '';
-            } else {
-                title.textContent = 'Add New Contact';
-                form.reset();
-            }
-            
-            modal.style.display = 'block';
-        }
-
-        function closeContactForm() {
-            document.getElementById('contactModal').style.display = 'none';
-            document.getElementById('contactForm').reset();
-            editingContactId = null;
-        }
-
-        function editContact(id) {
-            openContactForm(id);
-        }
-
-        function deleteContact(id) {
-            if (confirm('Are you sure you want to delete this contact?')) {
-                contacts = contacts.filter(c => c.id !== id);
-                renderContacts();
-            }
-        }
-
-        // User management
-        function renderUsers() {
-            const tbody = document.getElementById('users-table-body');
-            tbody.innerHTML = '';
-            
-            if (users.length === 0) {
-                tbody.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">👤</div>
-                        <h3>No users yet</h3>
-                        <p>Click "Add New User" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            users.forEach(user => {
-                const row = document.createElement('div');
-                row.className = 'table-row';
-                row.innerHTML = `
-                    <div>
-                        <strong>${user.firstName} ${user.lastName}</strong><br>
-                        <small style="color: #666;">${user.email}</small>
-                    </div>
-                    <div><span class="status-badge status-${user.role}">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</span></div>
-                    <div><span class="status-badge status-${user.status}">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span></div>
-                    <div>${user.lastLogin || '-'}</div>
-                    <div class="action-buttons">
-                        <button class="action-btn edit-btn" onclick="editUser(${user.id})">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">Delete</button>
-                    </div>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function openUserForm(userId = null) {
-            editingUserId = userId;
-            const modal = document.getElementById('userModal');
-            const title = document.getElementById('userModalTitle');
-            const form = document.getElementById('userForm');
-            
-            if (userId) {
-                const user = users.find(u => u.id === userId);
-                title.textContent = 'Edit User';
-                document.getElementById('userFirstName').value = user.firstName;
-                document.getElementById('userLastName').value = user.lastName;
-                document.getElementById('userEmail').value = user.email;
-                document.getElementById('userRole').value = user.role;
-                document.getElementById('userStatus').value = user.status;
-                document.getElementById('userPassword').value = ''; // Don't show password
-                document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
-                document.getElementById('userPassword').required = false;
-            } else {
-                title.textContent = 'Add New User';
-                form.reset();
-                document.getElementById('userPassword').placeholder = 'Enter password';
-                document.getElementById('userPassword').required = true;
-            }
-            
-            modal.style.display = 'block';
-        }
-
-        function closeUserForm() {
-            document.getElementById('userModal').style.display = 'none';
-            document.getElementById('userForm').reset();
-            editingUserId = null;
-        }
-
-        function editUser(id) {
-            openUserForm(id);
-        }
-
-        function deleteUser(id) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                users = users.filter(u => u.id !== id);
-                renderUsers();
-            }
-        }
-
-        // Form submissions
-        function initializeFormHandlers() {
-            const leadForm = document.getElementById('leadForm');
-            if (leadForm) {
-                leadForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const leadData = {
-                        firstName: document.getElementById('leadFirstName').value,
-                        lastName: document.getElementById('leadLastName').value,
-                        email: document.getElementById('leadEmail').value,
-                        phone: document.getElementById('leadPhone').value,
-                        company: document.getElementById('leadCompany').value,
-                        status: document.getElementById('leadStatus').value,
-                        value: parseFloat(document.getElementById('leadValue').value) || 0,
-                        notes: document.getElementById('leadNotes').value
-                    };
-                    
-                    if (editingLeadId) {
-                        const index = leads.findIndex(l => l.id === editingLeadId);
-                        if (index !== -1) {
-                            leads[index] = { ...leads[index], ...leadData };
-                        }
-                    } else {
-                        leadData.id = Date.now();
-                        leads.push(leadData);
-                    }
-                    
-                    closeLeadForm();
-                    renderLeads();
-                    updateDashboardStats();
-                });
-            }
-
-            const contactForm = document.getElementById('contactForm');
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const contactData = {
-                        firstName: document.getElementById('contactFirstName').value,
-                        lastName: document.getElementById('contactLastName').value,
-                        email: document.getElementById('contactEmail').value,
-                        phone: document.getElementById('contactPhone').value,
-                        company: document.getElementById('contactCompany').value,
-                        type: document.getElementById('contactType').value,
-                        jobTitle: document.getElementById('contactJobTitle').value
-                    };
-                    
-                    if (editingContactId) {
-                        const index = contacts.findIndex(c => c.id === editingContactId);
-                        if (index !== -1) {
-                            contacts[index] = { ...contacts[index], ...contactData };
-                        }
-                    } else {
-                        contactData.id = Date.now();
-                        contacts.push(contactData);
-                    }
-                    
-                    closeContactForm();
-                    renderContacts();
-                });
-            }
-
-            const userForm = document.getElementById('userForm');
-            if (userForm) {
-                userForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const userData = {
-                        firstName: document.getElementById('userFirstName').value,
-                        lastName: document.getElementById('userLastName').value,
-                        email: document.getElementById('userEmail').value,
-                        role: document.getElementById('userRole').value,
-                        status: document.getElementById('userStatus').value,
-                        lastLogin: new Date().toISOString().split('T')[0]
-                    };
-                    
-                    const password = document.getElementById('userPassword').value;
-                    if (password) {
-                        userData.password = password; // In real app, this would be hashed
-                    }
-                    
-                    if (editingUserId) {
-                        const index = users.findIndex(u => u.id === editingUserId);
-                        if (index !== -1) {
-                            users[index] = { ...users[index], ...userData };
-                        }
-                    } else {
-                        userData.id = Date.now();
-                        users.push(userData);
-                    }
-                    
-                    closeUserForm();
-                    renderUsers();
-                });
-            }
-        }
-
-        // Close modals when clicking outside
-        window.addEventListener('click', function(event) {
-            const modals = ['loginModal', 'leadModal', 'contactModal', 'userModal'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                    if (modalId === 'leadModal') closeLeadForm();
-                    if (modalId === 'contactModal') closeContactForm();
-                    if (modalId === 'userModal') closeUserForm();
-                    if (modalId === 'loginModal') closeLoginModal();
-                }
-            });
-        });
-                    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1113,6 +649,51 @@ let currentUser = null;
             color: #388e3c;
         }
 
+        .status-customer {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .status-partner {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .status-prospect {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-vendor {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-admin {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-manager {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-user {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .status-active {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .status-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -1189,6 +770,12 @@ let currentUser = null;
             transition: all 0.3s ease;
         }
 
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
         .form-actions {
             display: flex;
             gap: 15px;
@@ -1223,6 +810,16 @@ let currentUser = null;
             }
 
             .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .form-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -1718,6 +1315,79 @@ let currentUser = null;
         ];
 
         let currentUser = null;
+        let editingLeadId = null;
+        let editingContactId = null;
+        let editingUserId = null;
+
+        // Sample data
+        let leads = [
+            {
+                id: 1,
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john.smith@example.com',
+                phone: '+1-555-0123',
+                company: 'Tech Solutions Inc.',
+                status: 'new',
+                value: 5000,
+                notes: 'Interested in our premium package'
+            },
+            {
+                id: 2,
+                firstName: 'Sarah',
+                lastName: 'Johnson',
+                email: 'sarah.j@businesscorp.com',
+                phone: '+1-555-0456',
+                company: 'Business Corp',
+                status: 'qualified',
+                value: 12000,
+                notes: 'Decision maker, ready to proceed'
+            }
+        ];
+
+        let contacts = [
+            {
+                id: 1,
+                firstName: 'Mike',
+                lastName: 'Davis',
+                email: 'mike.davis@partner.com',
+                phone: '+1-555-0789',
+                company: 'Partner Solutions',
+                type: 'partner',
+                jobTitle: 'Sales Director'
+            },
+            {
+                id: 2,
+                firstName: 'Lisa',
+                lastName: 'Wong',
+                email: 'lisa.wong@customer.com',
+                phone: '+1-555-0321',
+                company: 'Customer Inc.',
+                type: 'customer',
+                jobTitle: 'IT Manager'
+            }
+        ];
+
+        let users = [
+            {
+                id: 1,
+                firstName: 'Admin',
+                lastName: 'User',
+                email: 'admin@uppalcrm.com',
+                role: 'admin',
+                status: 'active',
+                lastLogin: '2024-07-26'
+            },
+            {
+                id: 2,
+                firstName: 'Demo',
+                lastName: 'User',
+                email: 'demo@uppalcrm.com',
+                role: 'user',
+                status: 'active',
+                lastLogin: '2024-07-25'
+            }
+        ];
 
         // Login functionality
         function openLoginModal() {
@@ -1725,13 +1395,10 @@ let currentUser = null;
             const modal = document.getElementById('loginModal');
             if (modal) {
                 modal.style.display = 'block';
-                // Focus on email field
                 setTimeout(() => {
                     const emailField = document.getElementById('loginEmail');
                     if (emailField) emailField.focus();
                 }, 100);
-            } else {
-                console.error('Login modal not found!');
             }
         }
 
@@ -1755,7 +1422,6 @@ let currentUser = null;
                 console.log('Login successful!', user);
                 currentUser = user;
                 
-                // Hide homepage and show dashboard
                 const homepage = document.getElementById('homepage');
                 const dashboard = document.getElementById('crmDashboard');
                 const userWelcome = document.getElementById('userWelcome');
@@ -1765,6 +1431,8 @@ let currentUser = null;
                 if (userWelcome) userWelcome.textContent = `Welcome back, ${user.name}!`;
                 
                 closeLoginModal();
+                updateDashboardStats();
+                renderLeads();
                 return true;
             } else {
                 console.log('Login failed for:', email);
@@ -1782,8 +1450,441 @@ let currentUser = null;
                 
                 if (homepage) homepage.style.display = 'block';
                 if (dashboard) dashboard.style.display = 'none';
+                
+                // Reset to dashboard section
+                switchSection('dashboard');
             }
         }
+
+        // Navigation functions
+        function switchSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.crm-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.crm-nav-item').forEach(n => n.classList.remove('active'));
+            
+            // Show selected section
+            const sectionElement = document.getElementById(section + '-section');
+            if (sectionElement) {
+                sectionElement.classList.add('active');
+            }
+            
+            // Highlight active nav item
+            const navItems = document.querySelectorAll('.crm-nav-item');
+            navItems.forEach(item => {
+                if (item.textContent.toLowerCase() === section) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Refresh data
+            if (section === 'leads') renderLeads();
+            if (section === 'contacts') renderContacts();
+            if (section === 'users') renderUsers();
+            if (section === 'dashboard') updateDashboardStats();
+        }
+
+        // Dashboard stats
+        function updateDashboardStats() {
+            const totalLeads = leads.length;
+            const newLeads = leads.filter(l => l.status === 'new').length;
+            const qualifiedLeads = leads.filter(l => l.status === 'qualified').length;
+            const closedWon = leads.filter(l => l.status === 'closed').length;
+            
+            const totalLeadsEl = document.getElementById('totalLeads');
+            const newLeadsEl = document.getElementById('newLeads');
+            const qualifiedLeadsEl = document.getElementById('qualifiedLeads');
+            const closedWonEl = document.getElementById('closedWon');
+            
+            if (totalLeadsEl) totalLeadsEl.textContent = totalLeads;
+            if (newLeadsEl) newLeadsEl.textContent = newLeads;
+            if (qualifiedLeadsEl) qualifiedLeadsEl.textContent = qualifiedLeads;
+            if (closedWonEl) closedWonEl.textContent = closedWon;
+        }
+
+        // Lead management
+        function renderLeads() {
+            const tbody = document.getElementById('leads-table-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (leads.length === 0) {
+                tbody.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666; grid-column: 1 / -1;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">👥</div>
+                        <h3>No leads yet</h3>
+                        <p>Click "Add New Lead" to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            leads.forEach(lead => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <div>
+                        <strong>${lead.firstName} ${lead.lastName}</strong><br>
+                        <small style="color: #666;">${lead.email}</small>
+                    </div>
+                    <div>${lead.company || '-'}</div>
+                    <div><span class="status-badge status-${lead.status}">${lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}</span></div>
+                    <div>${lead.value ? lead.value.toLocaleString() : '0'}</div>
+                    <div class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="editLead(${lead.id})">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteLead(${lead.id})">Delete</button>
+                    </div>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openLeadForm(leadId = null) {
+            editingLeadId = leadId;
+            const modal = document.getElementById('leadModal');
+            const title = document.getElementById('leadModalTitle');
+            const form = document.getElementById('leadForm');
+            
+            if (leadId) {
+                const lead = leads.find(l => l.id === leadId);
+                if (lead) {
+                    title.textContent = 'Edit Lead';
+                    document.getElementById('leadFirstName').value = lead.firstName;
+                    document.getElementById('leadLastName').value = lead.lastName;
+                    document.getElementById('leadEmail').value = lead.email;
+                    document.getElementById('leadPhone').value = lead.phone || '';
+                    document.getElementById('leadCompany').value = lead.company || '';
+                    document.getElementById('leadStatus').value = lead.status;
+                    document.getElementById('leadValue').value = lead.value || '';
+                    document.getElementById('leadNotes').value = lead.notes || '';
+                }
+            } else {
+                title.textContent = 'Add New Lead';
+                form.reset();
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeLeadForm() {
+            const modal = document.getElementById('leadModal');
+            const form = document.getElementById('leadForm');
+            if (modal) modal.style.display = 'none';
+            if (form) form.reset();
+            editingLeadId = null;
+        }
+
+        function editLead(id) {
+            openLeadForm(id);
+        }
+
+        function deleteLead(id) {
+            if (confirm('Are you sure you want to delete this lead?')) {
+                leads = leads.filter(l => l.id !== id);
+                renderLeads();
+                updateDashboardStats();
+            }
+        }
+
+        // Contact management
+        function renderContacts() {
+            const tbody = document.getElementById('contacts-table-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (contacts.length === 0) {
+                tbody.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666; grid-column: 1 / -1;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📇</div>
+                        <h3>No contacts yet</h3>
+                        <p>Click "Add New Contact" to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            contacts.forEach(contact => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <div>
+                        <strong>${contact.firstName} ${contact.lastName}</strong><br>
+                        <small style="color: #666;">${contact.email}</small>
+                    </div>
+                    <div>${contact.phone || '-'}</div>
+                    <div>${contact.company || '-'}</div>
+                    <div><span class="status-badge status-${contact.type}">${contact.type.charAt(0).toUpperCase() + contact.type.slice(1)}</span></div>
+                    <div class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="editContact(${contact.id})">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteContact(${contact.id})">Delete</button>
+                    </div>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openContactForm(contactId = null) {
+            editingContactId = contactId;
+            const modal = document.getElementById('contactModal');
+            const title = document.getElementById('contactModalTitle');
+            const form = document.getElementById('contactForm');
+            
+            if (contactId) {
+                const contact = contacts.find(c => c.id === contactId);
+                if (contact) {
+                    title.textContent = 'Edit Contact';
+                    document.getElementById('contactFirstName').value = contact.firstName;
+                    document.getElementById('contactLastName').value = contact.lastName;
+                    document.getElementById('contactEmail').value = contact.email;
+                    document.getElementById('contactPhone').value = contact.phone || '';
+                    document.getElementById('contactCompany').value = contact.company || '';
+                    document.getElementById('contactType').value = contact.type;
+                    document.getElementById('contactJobTitle').value = contact.jobTitle || '';
+                }
+            } else {
+                title.textContent = 'Add New Contact';
+                form.reset();
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeContactForm() {
+            const modal = document.getElementById('contactModal');
+            const form = document.getElementById('contactForm');
+            if (modal) modal.style.display = 'none';
+            if (form) form.reset();
+            editingContactId = null;
+        }
+
+        function editContact(id) {
+            openContactForm(id);
+        }
+
+        function deleteContact(id) {
+            if (confirm('Are you sure you want to delete this contact?')) {
+                contacts = contacts.filter(c => c.id !== id);
+                renderContacts();
+            }
+        }
+
+        // User management
+        function renderUsers() {
+            const tbody = document.getElementById('users-table-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666; grid-column: 1 / -1;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">👤</div>
+                        <h3>No users yet</h3>
+                        <p>Click "Add New User" to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            users.forEach(user => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <div>
+                        <strong>${user.firstName} ${user.lastName}</strong><br>
+                        <small style="color: #666;">${user.email}</small>
+                    </div>
+                    <div><span class="status-badge status-${user.role}">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</span></div>
+                    <div><span class="status-badge status-${user.status}">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span></div>
+                    <div>${user.lastLogin || '-'}</div>
+                    <div class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="editUser(${user.id})">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">Delete</button>
+                    </div>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openUserForm(userId = null) {
+            editingUserId = userId;
+            const modal = document.getElementById('userModal');
+            const title = document.getElementById('userModalTitle');
+            const form = document.getElementById('userForm');
+            const passwordField = document.getElementById('userPassword');
+            
+            if (userId) {
+                const user = users.find(u => u.id === userId);
+                if (user) {
+                    title.textContent = 'Edit User';
+                    document.getElementById('userFirstName').value = user.firstName;
+                    document.getElementById('userLastName').value = user.lastName;
+                    document.getElementById('userEmail').value = user.email;
+                    document.getElementById('userRole').value = user.role;
+                    document.getElementById('userStatus').value = user.status;
+                    passwordField.value = '';
+                    passwordField.placeholder = 'Leave blank to keep current password';
+                    passwordField.required = false;
+                }
+            } else {
+                title.textContent = 'Add New User';
+                form.reset();
+                passwordField.placeholder = 'Enter password';
+                passwordField.required = true;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeUserForm() {
+            const modal = document.getElementById('userModal');
+            const form = document.getElementById('userForm');
+            if (modal) modal.style.display = 'none';
+            if (form) form.reset();
+            editingUserId = null;
+        }
+
+        function editUser(id) {
+            openUserForm(id);
+        }
+
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                users = users.filter(u => u.id !== id);
+                renderUsers();
+            }
+        }
+
+        // Form submissions
+        function initializeFormHandlers() {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('loginEmail').value;
+                    const password = document.getElementById('loginPassword').value;
+                    
+                    if (login(email, password)) {
+                        console.log('Login successful - redirecting to dashboard');
+                    } else {
+                        alert('Invalid email or password. Please try the demo credentials shown above.');
+                    }
+                });
+            }
+
+            const leadForm = document.getElementById('leadForm');
+            if (leadForm) {
+                leadForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const leadData = {
+                        firstName: document.getElementById('leadFirstName').value,
+                        lastName: document.getElementById('leadLastName').value,
+                        email: document.getElementById('leadEmail').value,
+                        phone: document.getElementById('leadPhone').value,
+                        company: document.getElementById('leadCompany').value,
+                        status: document.getElementById('leadStatus').value,
+                        value: parseFloat(document.getElementById('leadValue').value) || 0,
+                        notes: document.getElementById('leadNotes').value
+                    };
+                    
+                    if (editingLeadId) {
+                        const index = leads.findIndex(l => l.id === editingLeadId);
+                        if (index !== -1) {
+                            leads[index] = { ...leads[index], ...leadData };
+                        }
+                    } else {
+                        leadData.id = Date.now();
+                        leads.push(leadData);
+                    }
+                    
+                    closeLeadForm();
+                    renderLeads();
+                    updateDashboardStats();
+                });
+            }
+
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const contactData = {
+                        firstName: document.getElementById('contactFirstName').value,
+                        lastName: document.getElementById('contactLastName').value,
+                        email: document.getElementById('contactEmail').value,
+                        phone: document.getElementById('contactPhone').value,
+                        company: document.getElementById('contactCompany').value,
+                        type: document.getElementById('contactType').value,
+                        jobTitle: document.getElementById('contactJobTitle').value
+                    };
+                    
+                    if (editingContactId) {
+                        const index = contacts.findIndex(c => c.id === editingContactId);
+                        if (index !== -1) {
+                            contacts[index] = { ...contacts[index], ...contactData };
+                        }
+                    } else {
+                        contactData.id = Date.now();
+                        contacts.push(contactData);
+                    }
+                    
+                    closeContactForm();
+                    renderContacts();
+                });
+            }
+
+            const userForm = document.getElementById('userForm');
+            if (userForm) {
+                userForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const userData = {
+                        firstName: document.getElementById('userFirstName').value,
+                        lastName: document.getElementById('userLastName').value,
+                        email: document.getElementById('userEmail').value,
+                        role: document.getElementById('userRole').value,
+                        status: document.getElementById('userStatus').value,
+                        lastLogin: new Date().toISOString().split('T')[0]
+                    };
+                    
+                    const password = document.getElementById('userPassword').value;
+                    if (password) {
+                        userData.password = password; // In real app, this would be hashed
+                    }
+                    
+                    if (editingUserId) {
+                        const index = users.findIndex(u => u.id === editingUserId);
+                        if (index !== -1) {
+                            users[index] = { ...users[index], ...userData };
+                        }
+                    } else {
+                        userData.id = Date.now();
+                        users.push(userData);
+                    }
+                    
+                    closeUserForm();
+                    renderUsers();
+                });
+            }
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = ['loginModal', 'leadModal', 'contactModal', 'userModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    if (modalId === 'leadModal') closeLeadForm();
+                    if (modalId === 'contactModal') closeContactForm();
+                    if (modalId === 'userModal') closeUserForm();
+                    if (modalId === 'loginModal') closeLoginModal();
+                }
+            });
+        });
 
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -1805,35 +1906,11 @@ let currentUser = null;
             // Initialize form handlers
             initializeFormHandlers();
 
-            // Handle login form submission
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    console.log('Form submitted');
-                    
-                    const email = document.getElementById('loginEmail').value;
-                    const password = document.getElementById('loginPassword').value;
-                    
-                    console.log('Email:', email, 'Password length:', password.length);
-                    
-                    if (login(email, password)) {
-                        console.log('Login successful - redirecting to dashboard');
-                        // Initialize CRM data after login
-                        updateDashboardStats();
-                        renderLeads();
-                    } else {
-                        alert('Invalid email or password. Please try the demo credentials shown above.');
-                    }
-                });
-                console.log('Form listener attached');
-            } else {
-                console.error('Login form not found!');
-            }
-
-            // Test that buttons exist
-            const loginButtons = document.querySelectorAll('[onclick*="openLoginModal"]');
-            console.log('Found', loginButtons.length, 'login buttons');
+            // Initialize dashboard stats (but don't show dashboard yet)
+            updateDashboardStats();
+            renderLeads();
+            renderContacts();
+            renderUsers();
         });
 
         // Global function to test login modal
