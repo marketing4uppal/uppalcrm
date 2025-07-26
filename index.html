@@ -418,6 +418,25 @@
             text-decoration: underline;
         }
 
+        .demo-credentials {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .demo-credentials strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .credential-item {
+            margin-bottom: 5px;
+        }
+
         /* CRM Dashboard Styles */
         .crm-container {
             display: none;
@@ -521,8 +540,8 @@
                     <li><a href="#contact">Contact</a></li>
                 </ul>
                 <div class="nav-actions">
-                    <a href="#" class="btn btn-outline" onclick="openLoginModal()">Login</a>
-                    <a href="#" class="btn btn-primary" onclick="openLoginModal()">Start Free Trial</a>
+                    <button class="btn btn-outline" onclick="openLoginModal()">Login</button>
+                    <button class="btn btn-primary" onclick="openLoginModal()">Start Free Trial</button>
                 </div>
             </div>
         </nav>
@@ -533,7 +552,7 @@
                 <h1>Transform Your Business Relationships</h1>
                 <p>Uppal CRM helps small businesses build stronger customer relationships, increase sales, and grow faster with intelligent contact management and automation.</p>
                 <div class="hero-actions">
-                    <a href="#" class="btn btn-white btn-hero" onclick="openLoginModal()">Start Free Trial</a>
+                    <button class="btn btn-white btn-hero" onclick="openLoginModal()">Start Free Trial</button>
                     <a href="#features" class="btn btn-outline btn-hero">Learn More</a>
                 </div>
             </div>
@@ -610,7 +629,7 @@
             <div class="cta-container">
                 <h2>Ready to Transform Your Business?</h2>
                 <p>Join thousands of businesses already using Uppal CRM to build better customer relationships and drive growth.</p>
-                <a href="#" class="btn btn-white btn-hero" onclick="openLoginModal()">Start Your Free Trial Today</a>
+                <button class="btn btn-white btn-hero" onclick="openLoginModal()">Start Your Free Trial Today</button>
             </div>
         </section>
 
@@ -656,14 +675,23 @@
         <div class="modal-content">
             <button class="close-btn" onclick="closeLoginModal()">&times;</button>
             <h2>Welcome Back</h2>
+            
+            <!-- Demo Credentials Box -->
+            <div class="demo-credentials">
+                <strong>Demo Login Credentials:</strong>
+                <div class="credential-item">📧 admin@uppalcrm.com | 🔑 admin123</div>
+                <div class="credential-item">📧 demo@uppalcrm.com | 🔑 demo123</div>
+                <div class="credential-item">📧 manager@uppalcrm.com | 🔑 manager123</div>
+            </div>
+            
             <form id="loginForm">
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" class="form-control" id="loginEmail" required>
+                    <input type="email" class="form-control" id="loginEmail" required placeholder="Enter your email">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" class="form-control" id="loginPassword" required>
+                    <input type="password" class="form-control" id="loginPassword" required placeholder="Enter your password">
                 </div>
                 <div class="login-actions">
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
@@ -714,6 +742,8 @@
     </div>
 
     <script>
+        console.log('Script loading...');
+
         // Demo login credentials
         const validCredentials = [
             { email: 'admin@uppalcrm.com', password: 'admin123', name: 'Admin User' },
@@ -725,65 +755,131 @@
 
         // Login functionality
         function openLoginModal() {
-            document.getElementById('loginModal').style.display = 'block';
+            console.log('Opening login modal...');
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.style.display = 'block';
+                // Focus on email field
+                setTimeout(() => {
+                    const emailField = document.getElementById('loginEmail');
+                    if (emailField) emailField.focus();
+                }, 100);
+            } else {
+                console.error('Login modal not found!');
+            }
         }
 
         function closeLoginModal() {
-            document.getElementById('loginModal').style.display = 'none';
-            document.getElementById('loginForm').reset();
+            console.log('Closing login modal...');
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.style.display = 'none';
+                const form = document.getElementById('loginForm');
+                if (form) form.reset();
+            }
         }
 
         function login(email, password) {
+            console.log('Attempting login with:', email);
             const user = validCredentials.find(cred => 
                 cred.email === email && cred.password === password
             );
 
             if (user) {
+                console.log('Login successful!', user);
                 currentUser = user;
-                document.getElementById('homepage').style.display = 'none';
-                document.getElementById('crmDashboard').style.display = 'block';
-                document.getElementById('userWelcome').textContent = `Welcome back, ${user.name}!`;
+                
+                // Hide homepage and show dashboard
+                const homepage = document.getElementById('homepage');
+                const dashboard = document.getElementById('crmDashboard');
+                const userWelcome = document.getElementById('userWelcome');
+                
+                if (homepage) homepage.style.display = 'none';
+                if (dashboard) dashboard.style.display = 'block';
+                if (userWelcome) userWelcome.textContent = `Welcome back, ${user.name}!`;
+                
                 closeLoginModal();
                 return true;
+            } else {
+                console.log('Login failed for:', email);
+                return false;
             }
-            return false;
         }
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
+                console.log('Logging out...');
                 currentUser = null;
-                document.getElementById('homepage').style.display = 'block';
-                document.getElementById('crmDashboard').style.display = 'none';
+                
+                const homepage = document.getElementById('homepage');
+                const dashboard = document.getElementById('crmDashboard');
+                
+                if (homepage) homepage.style.display = 'block';
+                if (dashboard) dashboard.style.display = 'none';
             }
         }
 
-        // Handle login form submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (login(email, password)) {
-                // Login successful
-            } else {
-                alert('Invalid email or password. Please try again.\n\nDemo credentials:\nadmin@uppalcrm.com / admin123\ndemo@uppalcrm.com / demo123\nmanager@uppalcrm.com / manager123');
-            }
-        });
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const loginModal = document.getElementById('loginModal');
-            if (event.target === loginModal) {
-                closeLoginModal();
-            }
-        }
-
-        // Initialize app
+        // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('homepage').style.display = 'block';
-            document.getElementById('crmDashboard').style.display = 'none';
+            console.log('DOM loaded, initializing app...');
+            
+            // Ensure homepage is visible and dashboard is hidden
+            const homepage = document.getElementById('homepage');
+            const dashboard = document.getElementById('crmDashboard');
+            
+            if (homepage) {
+                homepage.style.display = 'block';
+                console.log('Homepage displayed');
+            }
+            if (dashboard) {
+                dashboard.style.display = 'none';
+                console.log('Dashboard hidden');
+            }
+
+            // Handle login form submission
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Form submitted');
+                    
+                    const email = document.getElementById('loginEmail').value;
+                    const password = document.getElementById('loginPassword').value;
+                    
+                    console.log('Email:', email, 'Password length:', password.length);
+                    
+                    if (login(email, password)) {
+                        console.log('Login successful - redirecting to dashboard');
+                    } else {
+                        alert('Invalid email or password. Please try the demo credentials shown above.');
+                    }
+                });
+                console.log('Form listener attached');
+            } else {
+                console.error('Login form not found!');
+            }
+
+            // Close modal when clicking outside
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) {
+                window.addEventListener('click', function(event) {
+                    if (event.target === loginModal) {
+                        closeLoginModal();
+                    }
+                });
+            }
+
+            // Test that buttons exist
+            const loginButtons = document.querySelectorAll('[onclick*="openLoginModal"]');
+            console.log('Found', loginButtons.length, 'login buttons');
         });
+
+        // Global function to test login modal
+        window.testLogin = function() {
+            openLoginModal();
+        };
+
+        console.log('Script loaded successfully');
     </script>
 </body>
 </html>
